@@ -23,12 +23,28 @@ logger = logging.getLogger(__name__)
 #     model = None
 
 
-MODEL_NAME = "IrisClassifier"
-STAGE = "Production" 
+# MODEL_NAME = "IrisClassifier"
+# STAGE = "Production" 
+
+# try:
+#     model = mlflow.sklearn.load_model(model_uri=f"models:/{MODEL_NAME}/{STAGE}")
+#     logger.info(f"Successfully loaded model '{MODEL_NAME}' in '{STAGE}' stage.")
+# except Exception as e:
+#     logger.error(f"Error loading model: {e}")
+#     model = None
+
+EXPERIMENT_ID = "240103695117661407"
+RUN_ID = "749318566ed94622822a31878fbcb10a"  
+
+# Construct the full, absolute path inside the container
+# MODEL_PATH_IN_CONTAINER = f"/app/mlruns/{EXPERIMENT_ID}/{RUN_ID}/artifacts/model"
+
+MODEL_PATH_IN_CONTAINER = f"/app/mlruns/models"
 
 try:
-    model = mlflow.sklearn.load_model(model_uri=f"models:/{MODEL_NAME}/{STAGE}")
-    logger.info(f"Successfully loaded model '{MODEL_NAME}' in '{STAGE}' stage.")
+    # We tell MLflow to load the model from this specific directory.
+    model = mlflow.sklearn.load_model(model_uri=MODEL_PATH_IN_CONTAINER)
+    logger.info(f"Successfully loaded model from path '{MODEL_PATH_IN_CONTAINER}'.")
 except Exception as e:
     logger.error(f"Error loading model: {e}")
     model = None
