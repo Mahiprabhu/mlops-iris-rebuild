@@ -1,7 +1,7 @@
 import mlflow
 import uvicorn
 import logging
-import os
+import os, pickle
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -33,20 +33,35 @@ logger = logging.getLogger(__name__)
 #     logger.error(f"Error loading model: {e}")
 #     model = None
 
-EXPERIMENT_ID = "240103695117661407"
-RUN_ID = "749318566ed94622822a31878fbcb10a"  
+# EXPERIMENT_ID = "240103695117661407"
+# RUN_ID = "749318566ed94622822a31878fbcb10a"  
 
 # Construct the full, absolute path inside the container
 # MODEL_PATH_IN_CONTAINER = f"/app/mlruns/{EXPERIMENT_ID}/{RUN_ID}/artifacts/model"
 
-MODEL_NAME = "IrisClassifier"
-MODEL_VERSION = "2" # Use the version number that is in Production
-MODEL_PATH_IN_CONTAINER = f"/app/mlruns/models/{MODEL_NAME}/{MODEL_VERSION}"
+# MODEL_NAME = "IrisClassifier"
+# MODEL_VERSION = "2" # Use the version number that is in Production
+# MODEL_PATH_IN_CONTAINER = f"/app/mlruns/models/{MODEL_NAME}/{MODEL_VERSION}"
+
+# try:
+#     # We tell MLflow to load the model from this specific directory.
+#     model = mlflow.sklearn.load_model(model_uri=MODEL_PATH_IN_CONTAINER)
+#     logger.info(f"Successfully loaded model '{MODEL_NAME}' version '{MODEL_VERSION}'.")
+# except Exception as e:
+#     logger.error(f"Error loading model: {e}")
+#     model = None
+
+MODEL_PATH_IN_CONTAINER = "/app/mlruns/240103695117661407/models/m-45c328d3a9074c39a6ad1206a99d1b06/artifacts/"
 
 try:
-    # We tell MLflow to load the model from this specific directory.
-    model = mlflow.sklearn.load_model(model_uri=MODEL_PATH_IN_CONTAINER)
-    logger.info(f"Successfully loaded model '{MODEL_NAME}' version '{MODEL_VERSION}'.")
+    # Construct the full path to the pickle file
+    model_file_path = os.path.join(MODEL_PATH_IN_CONTAINER, "model.pkl")
+
+    # Load the model directly using pickle
+    with open(model_file_path, "rb") as f:
+        model = pickle.load(f)
+
+    logger.info(f"Successfully loaded model from path '{model_file_path}'.")
 except Exception as e:
     logger.error(f"Error loading model: {e}")
     model = None
