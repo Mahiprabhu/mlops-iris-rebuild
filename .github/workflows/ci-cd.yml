@@ -1,0 +1,74 @@
+name: CI/CD Pipeline for Iris Classifier
+
+# This workflow is triggered on every push to the 'main' branch
+on:
+  push:
+    branches: [ main ]
+
+# A workflow is composed of one or more jobs.
+jobs:
+  # First job: lint the code and build the Docker image
+  build-and-push:
+    runs-on: ubuntu-latest # The type of machine to run the job on
+    
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Step 3: Install dependencies for linting (and optional testing)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 # We will use flake8 for linting
+
+      # Step 4: Lint the code with flake8
+      - name: Lint with flake8
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      # Step 5: Log in to Docker Hub using the secrets we created
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 6: Build the Docker image and push it to Docker Hub
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # The path to the Dockerfile
+          push: true # Push the image to the registry after building
+          tags: ${{ secrets.DOCKER_USERNAME }}/iris-classifier:latest # The tag for our image
+
+  # Second job: deploy the application
+  # This job depends on the 'build-and-push' job, so it only runs if the first one succeeds.
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push # This ensures the 'build-and-push' job runs first
+    
+    steps:
+      # Step 1: Checkout the repository again to get the files needed for deployment
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Deploy to local machine (example, for demonstration purposes)
+      - name: Deploy
+        run: |
+          echo "Simulating a deployment. In a real-world scenario, this step would deploy to a cloud server like EC2."
+          echo "We would typically use ssh or a cloud provider's CLI to pull the image and run it."
+          # A real deployment script would look something like this:
+          # docker pull ${{ secrets.DOCKER_USERNAME }}/iris-classifier:latest
+          # docker stop iris-classifier-container || true
+          # docker rm iris-classifier-container || true
+          # docker run -d --name iris-classifier-container -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/iris-classifier:latest
