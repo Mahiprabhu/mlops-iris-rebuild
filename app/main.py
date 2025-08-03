@@ -11,15 +11,27 @@ logger = logging.getLogger(__name__)
 
 # --- Load the Model from MLflow Model Registry ---
 
-MODEL_NAME = "IrisClassifier"
-STAGE = "Production" 
+# --- Load the Model Directly from the run's artifacts ---
+RUN_ID = "749318566ed94622822a31878fbcb10a" 
 
 try:
-    model = mlflow.sklearn.load_model(model_uri=f"models:/{MODEL_NAME}/{STAGE}")
-    logger.info(f"Successfully loaded model '{MODEL_NAME}' in '{STAGE}' stage.")
+    model_uri = f"runs:/{RUN_ID}/model"
+    model = mlflow.sklearn.load_model(model_uri=model_uri)
+    logger.info(f"Successfully loaded model from run '{RUN_ID}'.")
 except Exception as e:
     logger.error(f"Error loading model: {e}")
     model = None
+
+
+# MODEL_NAME = "IrisClassifier"
+# STAGE = "Production" 
+
+# try:
+#     model = mlflow.sklearn.load_model(model_uri=f"models:/{MODEL_NAME}/{STAGE}")
+#     logger.info(f"Successfully loaded model '{MODEL_NAME}' in '{STAGE}' stage.")
+# except Exception as e:
+#     logger.error(f"Error loading model: {e}")
+#     model = None
 
 # --- Define our FastAPI application instance ---
 app = FastAPI(
