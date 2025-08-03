@@ -39,7 +39,8 @@ RUN_ID = "749318566ed94622822a31878fbcb10a"
 # Construct the full, absolute path inside the container
 # MODEL_PATH_IN_CONTAINER = f"/app/mlruns/{EXPERIMENT_ID}/{RUN_ID}/artifacts/model"
 
-MODEL_PATH_IN_CONTAINER = f"/app/mlruns/models"
+MODEL_NAME = "IrisClassifier"
+MODEL_PATH_IN_CONTAINER = f"/app/mlruns/models/{MODEL_NAME}/"
 
 try:
     # We tell MLflow to load the model from this specific directory.
