@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/mangaimahi/Mahi/MTech/Sem3/MLOps/mlops-iris-new/mlops-iris-rebuild/mlruns/240103695117661407/8612ebf48ed841a3a511cf1e53de7370/artifacts
+end_time: 1754219570524
+entry_point_name: ''
+experiment_id: '240103695117661407'
+lifecycle_stage: active
+run_id: 8612ebf48ed841a3a511cf1e53de7370
+run_name: grandiose-ape-630
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754219568693
+status: 3
+tags: []
+user_id: mangaimahi

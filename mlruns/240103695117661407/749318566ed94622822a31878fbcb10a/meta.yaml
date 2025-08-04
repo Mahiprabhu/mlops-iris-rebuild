@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/mangaimahi/Mahi/MTech/Sem3/MLOps/mlops-iris-new/mlops-iris-rebuild/mlruns/240103695117661407/749318566ed94622822a31878fbcb10a/artifacts
+end_time: 1754219572097
+entry_point_name: ''
+experiment_id: '240103695117661407'
+lifecycle_stage: active
+run_id: 749318566ed94622822a31878fbcb10a
+run_name: learned-hare-789
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754219570526
+status: 3
+tags: []
+user_id: mangaimahi

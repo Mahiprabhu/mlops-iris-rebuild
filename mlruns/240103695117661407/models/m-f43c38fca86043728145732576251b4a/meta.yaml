@@ -1,0 +1,10 @@
+artifact_location: file:///Users/mangaimahi/Mahi/MTech/Sem3/MLOps/mlops-iris-new/mlops-iris-rebuild/mlruns/240103695117661407/models/m-f43c38fca86043728145732576251b4a/artifacts
+creation_timestamp: 1754219568711
+experiment_id: '240103695117661407'
+last_updated_timestamp: 1754219570522
+model_id: m-f43c38fca86043728145732576251b4a
+model_type: null
+name: model
+source_run_id: 8612ebf48ed841a3a511cf1e53de7370
+status: 2
+status_message: null
