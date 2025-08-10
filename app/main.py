@@ -5,52 +5,36 @@ import os, pickle
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+import logging
+import os
+from logging.handlers import RotatingFileHandler
+
+# Define the log file path
+LOG_FILE = "app.log"
+
+# Create a logger instance
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# Create a rotating file handler to store logs
+file_handler = RotatingFileHandler(
+    LOG_FILE,
+    maxBytes=1024 * 1024 * 10, # 10 MB
+    backupCount=5
+)
+file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(file_handler)
+
+# console logging
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(console_handler)
+
+# # Configure logging
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# logger = logging.getLogger(__name__)
 
 # --- Load the Model from MLflow Model Registry ---
-
-# --- Load the Model Directly from the run's artifacts ---
-# RUN_ID = "749318566ed94622822a31878fbcb10a" 
-
-# try:
-#     model_uri = f"runs:/{RUN_ID}/model"
-#     model = mlflow.sklearn.load_model(model_uri=model_uri)
-#     logger.info(f"Successfully loaded model from run '{RUN_ID}'.")
-# except Exception as e:
-#     logger.error(f"Error loading model: {e}")
-#     model = None
-
-
-# MODEL_NAME = "IrisClassifier"
-# STAGE = "Production" 
-
-# try:
-#     model = mlflow.sklearn.load_model(model_uri=f"models:/{MODEL_NAME}/{STAGE}")
-#     logger.info(f"Successfully loaded model '{MODEL_NAME}' in '{STAGE}' stage.")
-# except Exception as e:
-#     logger.error(f"Error loading model: {e}")
-#     model = None
-
-# EXPERIMENT_ID = "240103695117661407"
-# RUN_ID = "749318566ed94622822a31878fbcb10a"  
-
-# Construct the full, absolute path inside the container
-# MODEL_PATH_IN_CONTAINER = f"/app/mlruns/{EXPERIMENT_ID}/{RUN_ID}/artifacts/model"
-
-# MODEL_NAME = "IrisClassifier"
-# MODEL_VERSION = "2" # Use the version number that is in Production
-# MODEL_PATH_IN_CONTAINER = f"/app/mlruns/models/{MODEL_NAME}/{MODEL_VERSION}"
-
-# try:
-#     # We tell MLflow to load the model from this specific directory.
-#     model = mlflow.sklearn.load_model(model_uri=MODEL_PATH_IN_CONTAINER)
-#     logger.info(f"Successfully loaded model '{MODEL_NAME}' version '{MODEL_VERSION}'.")
-# except Exception as e:
-#     logger.error(f"Error loading model: {e}")
-#     model = None
-
 MODEL_PATH_IN_CONTAINER = "/app/mlruns/240103695117661407/models/m-45c328d3a9074c39a6ad1206a99d1b06/artifacts/"
 
 try:
