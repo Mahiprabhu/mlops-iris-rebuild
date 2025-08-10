@@ -4,10 +4,23 @@ import logging
 import os, pickle
 from fastapi import FastAPI
 from pydantic import BaseModel
-
 import logging
 import os
 from logging.handlers import RotatingFileHandler
+from prometheus_client import Counter, Histogram, generate_latest
+from starlette.responses import Response
+
+# Prometheus metrics definitions
+REQUEST_COUNT = Counter(
+    "iris_api_requests_total",
+    "Total number of prediction requests."
+)
+
+PREDICTION_TIME = Histogram(
+    "iris_prediction_duration_seconds",
+    "Duration of prediction requests in seconds."
+)
+
 
 # Define the log file path
 LOG_FILE = "app.log"
@@ -30,9 +43,7 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(console_handler)
 
-# # Configure logging
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-# logger = logging.getLogger(__name__)
+
 
 # --- Load the Model from MLflow Model Registry ---
 MODEL_PATH_IN_CONTAINER = "/app/mlruns/240103695117661407/models/m-45c328d3a9074c39a6ad1206a99d1b06/artifacts/"
@@ -71,8 +82,17 @@ def home():
     """Returns a welcome message."""
     return {"message": "Welcome to the Iris Classifier API. Use the /predict endpoint."}
 
+# New /metrics endpoint
+@app.get("/metrics")
+def metrics():
+    return Response(content=generate_latest(), media_type="text/plain")
+
+# The /predict endpoint needs to be decorated with our metrics
+
 @app.post("/predict")
+@PREDICTION_TIME.time() 
 def predict(features: IrisFeatures):
+    REQUEST_COUNT.inc() 
     """
     Accepts a JSON payload with iris features and returns a prediction.
     """
