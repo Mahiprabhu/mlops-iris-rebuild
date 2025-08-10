@@ -1,16 +1,16 @@
 import mlflow
 import uvicorn
 import logging
-import os, pickle
+import os
+import pickle
+from logging.handlers import RotatingFileHandler
 from fastapi import FastAPI
 from pydantic import BaseModel
-import logging
-import os
-from logging.handlers import RotatingFileHandler
+from fastapi.responses import PlainTextResponse
 from prometheus_client import Counter, Histogram, generate_latest
 from starlette.responses import Response
 
-# Prometheus metrics definitions
+# --- Prometheus metrics definitions ---
 REQUEST_COUNT = Counter(
     "iris_api_requests_total",
     "Total number of prediction requests."
@@ -21,8 +21,8 @@ PREDICTION_TIME = Histogram(
     "Duration of prediction requests in seconds."
 )
 
-
-# Define the log file path
+# --- Logging Configuration ---
+# Define the log file path inside the container
 LOG_FILE = "app.log"
 
 # Create a logger instance
@@ -32,20 +32,19 @@ logger.setLevel(logging.INFO)
 # Create a rotating file handler to store logs
 file_handler = RotatingFileHandler(
     LOG_FILE,
-    maxBytes=1024 * 1024 * 10, # 10 MB
+    maxBytes=1024 * 1024 * 10,  # 10 MB
     backupCount=5
 )
 file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(file_handler)
 
-# console logging
+# Add a console handler to also show logs in the terminal
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(console_handler)
 
 
-
-# --- Load the Model from MLflow Model Registry ---
+# --- Load the Model Directly from its specific artifact path ---
 MODEL_PATH_IN_CONTAINER = "/app/mlruns/240103695117661407/models/m-45c328d3a9074c39a6ad1206a99d1b06/artifacts/"
 
 try:
@@ -82,17 +81,16 @@ def home():
     """Returns a welcome message."""
     return {"message": "Welcome to the Iris Classifier API. Use the /predict endpoint."}
 
-# New /metrics endpoint
-@app.get("/metrics")
+# The /metrics endpoint for monitoring
+@app.get("/metrics", response_class=PlainTextResponse)
 def metrics():
-    return Response(content=generate_latest(), media_type="text/plain")
+    return generate_latest().decode("utf-8")
 
-# The /predict endpoint needs to be decorated with our metrics
-
+# The /predict endpoint with metrics tracking
 @app.post("/predict")
-@PREDICTION_TIME.time() 
+@PREDICTION_TIME.time()
 def predict(features: IrisFeatures):
-    REQUEST_COUNT.inc() 
+    REQUEST_COUNT.inc()
     """
     Accepts a JSON payload with iris features and returns a prediction.
     """
