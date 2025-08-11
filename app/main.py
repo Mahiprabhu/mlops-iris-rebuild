@@ -91,7 +91,7 @@ def metrics():
 @app.post("/retrain")
 def retrain():
     try:
-        # We run the training script as a subprocess
+        # re-training script as a subprocess
         result = subprocess.run(
             ["python", "scripts/train.py"],
             capture_output=True,
