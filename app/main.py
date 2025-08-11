@@ -24,7 +24,8 @@ PREDICTION_TIME = Histogram(
 
 # --- Logging Configuration ---
 # Define the log file path inside the container
-LOG_FILE = "app.log"
+# LOG_FILE = "app.log"
+LOG_FILE = "/app/logs/app.log"
 
 # Create a logger instance
 logger = logging.getLogger(__name__)
